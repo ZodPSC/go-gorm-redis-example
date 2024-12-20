@@ -1,22 +1,25 @@
 FROM golang:1.23.4 AS build-stage
 
 WORKDIR /app
-COPY ./go.mod ./
-#COPY go.sum ./
+
+COPY go.mod go.sum ./
 RUN go mod download
+#RUN go mod tidy
+#RUN go get github.com/mattn/go-sqlite3
 
-COPY . .
-#COPY *.go ./
-#COPY ./storage/*.go ./storage/
+COPY *.go ./
+COPY storage storage
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /golang-app
+#RUN go env -w CGO_ENABLED=1
+#RUN CGO_ENABLED=1 GOOS=linux go build -ldflags "-s -w" -o /golang-app
+RUN CGO_ENABLED=1 GOOS=linux go build -o /golang-app
 
 # run test
 FROM build-stage AS run-test-stage
 RUN go test -v ./..
 
 # deploy
-FROM gcr.io/distroless/static-debian12 AS build-release-stage
+FROM gcr.io/distroless/base-debian12 AS build-release-stage
 
 WORKDIR /
 
