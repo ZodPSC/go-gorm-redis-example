@@ -1,7 +1,7 @@
 # go-gorm-redis-example
 
 ```
-cd .\golang-app\
+cd ./golang-app/
 go mod tidy
 
 ```
